@@ -20,16 +20,25 @@ class RegisterSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
 
+    # Перевірка унікальності username
     def validate_username(self, value):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("Username already exists")
         return value
 
+    # Перевірка мінімальної довжини пароля
     def validate_password(self, value):
         if len(value) < 6:
             raise serializers.ValidationError("Password must be at least 6 characters")
         return value
 
+    # Перевірка унікальності email
+    def validate_email(self, value):
+        if value and User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Email already exists")
+        return value
+
+    # Створення нового користувача
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
